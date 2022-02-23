@@ -1,0 +1,83 @@
+﻿@page "/createoffer/{productId}/{price}"
+<h2>Create Offer</h2>
+<EditForm Model="offer" OnValidSubmit="Create" class="card card-body bg-light mt-5">
+    <DataAnnotationsValidator />
+    <div class="form-group row">
+        <label for="price" class="col-md-2 col-form-label">Product Price:@price</label>
+    </div>
+    <div class="form-group row">
+        <label for="" class="col-md-2 col-form-label">Your offer:</label>
+        <div class="col-md-10">
+            <InputNumber id="price" class="form-control" @bind-Value="offer.Price" />
+            <ValidationMessage For="@(() => offer.Price)" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="" class="col-md-2 col-form-label">Offer with percentage:</label>
+        <div class="col-md-10">
+            <RadzenDropDown AllowClear="true" TValue="string" Class="w-100"
+                            Data=@Percent @bind-Value="PercentValue" Change="@(()=>Change())" />
+        </div>
+    </div>
+      
+    <div class="row">
+        <div class="col-md-12 text-right">
+            <button type="submit" class="btn btn-success">Create</button>
+        </div>
+    </div>
+</EditForm>
+@code {
+    [Parameter]
+    public string productId { get; set; }
+
+    [Parameter]
+    public string price { get; set; }
+
+    [Inject]
+    public IOfferHttpService service { get; set; }
+
+    [Inject]
+    public IToastService toastService { get; set; }
+
+    public OfferModel offer = new OfferModel();
+
+    private async Task Create()
+    {
+        
+        offer.IsActive = true;
+        offer.ProductId = Convert.ToInt32(productId);
+        offer.UserId = "6cb704cd-c253-430a-a682-7869d0c51976";
+        var result = await service.CreateOffer(offer);
+        if (result.IsSuccess)
+        {
+            toastService.ShowSuccess(result.Message);
+        }
+        else
+        {
+            toastService.ShowError(result.Message);
+        }
+    }
+
+    private List<string> Percent { get; set; }
+
+    private string PercentValue { get; set; }
+
+    protected override void OnInitialized()
+    {
+        string[] percentList = { "%30", "%40", "%50", "%60", "%70" };
+
+        Percent = new List<string>(percentList);
+
+        offer.Price = Convert.ToDouble(price);
+    }
+
+    private void Change()
+    {
+        if (PercentValue != null)
+        {
+            var percent = Convert.ToInt32(PercentValue.Trim('%'));
+            offer.Price = (Convert.ToDouble(price) * percent) / 100;
+
+        }
+    }
+}

@@ -1,0 +1,91 @@
+﻿<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">ProductCatalogue.UI</a>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <ul class="nav flex-column">
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="createcategory">
+                <span class="oi oi-plus" aria-hidden="true"></span> Category
+            </NavLink>
+        </li>
+        <li class="nav-item px-3">
+            <NavLink class="nav-link" href="productcreate">
+                <span class="oi oi-plus" aria-hidden="true"></span> Product
+            </NavLink>
+        </li>
+        @foreach (var category in Categories)
+        {
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="@category.Id">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> @category.CategoryName
+
+                </NavLink>
+                <button type="button" class="btn btn-info" @onclick="() => RedirectToUpdate(category.Id)">Update</button>
+                <button type="button" class="btn btn-danger" @onclick="() =>DeleteCategory(category.Id)">Delete</button>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    public List<CategoryModel> Categories { get; set; } = new List<CategoryModel>();
+    public string ErrorMessage { get; set; }
+    public int TotalCount { get; set; }
+    [Inject]
+    public ICategoryHttpService CategoryService { get; set; }
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await GetAllCategory();
+    }
+    private async Task GetAllCategory()
+    {
+        var data = await CategoryService.GetCategory();
+        Categories = data.Data.ToList();
+        ErrorMessage = data.Message;
+        TotalCount = data.TotalCount;
+    }
+
+    private void RedirectToUpdate(int id)
+    {
+        var url = Path.Combine("/updatecategory/", id.ToString());
+        NavigationManager.NavigateTo(url);
+    }
+    [Inject]
+    public IToastService toastService { get; set; }
+
+    private async Task DeleteCategory(int id)
+    {
+        var ids = Convert.ToString(id);
+        var result=await CategoryService.DeleteCategory(ids);
+        if (result.IsSuccess)
+        {
+            toastService.ShowSuccess(result.Message);
+        }
+        else
+        {
+            toastService.ShowError(result.Message);
+        }
+        await GetAllCategory();
+    }
+}

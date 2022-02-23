@@ -1,0 +1,38 @@
+﻿@page "/createCategory"
+<h2>Create Category</h2>
+<EditForm Model="category" OnValidSubmit="Create" class="card card-body bg-light mt-5">
+    <DataAnnotationsValidator />
+    <div class="form-group row">
+        <label for="name" class="col-md-2 col-form-label">Name:</label>
+        <div class="col-md-10">
+            <InputText id="name" class="form-control" @bind-Value="category.CategoryName" />
+            <ValidationMessage For="@(() => category.CategoryName)" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 text-right">
+            <button type="submit" class="btn btn-success">Create</button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    private CategoryModel category = new CategoryModel();
+    [Inject]
+    public ICategoryHttpService service { get; set; }
+    [Inject]
+    public IToastService   toastService{ get; set; }
+    private async Task Create()
+    {
+        var result= await service.CreateCategory(category);
+        if (result.IsSuccess)
+        {
+            toastService.ShowSuccess(result.Message);
+        }
+        else
+        {
+            toastService.ShowError(result.Message);
+        }
+    }
+}

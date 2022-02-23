@@ -1,0 +1,46 @@
+﻿@page "/updateCategory/{id}"
+@if (category!= null) { 
+<EditForm Model="category" OnValidSubmit="Update" class="card card-body bg-light mt-5">
+    <DataAnnotationsValidator />
+    <div class="form-group row">
+        <label for="name" class="col-md-2 col-form-label">Name:</label>
+        <div class="col-md-10">
+            <InputText id="name" class="form-control" @bind-Value="category.Data.CategoryName" />
+            <ValidationMessage For="@(() => category.Data.CategoryName)" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 text-right">
+            <button type="submit" class="btn btn-info">Update</button>
+        </div>
+    </div>
+</EditForm>
+}
+@code {
+    public Result<CategoryModel> category { get; set; }
+    [Inject]
+    public ICategoryHttpService service { get; set; }
+    [Inject]
+    public IToastService toastService { get; set; }
+    [Parameter]
+    public string Id { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        category = await service.GetCategoryById(Id);
+    }
+    private async Task Update()
+    {
+        var result=  await service.UpdateCategory(category.Data);
+        if (result.IsSuccess)
+        {
+            toastService.ShowSuccess(result.Message);
+        }
+        else
+        {
+            toastService.ShowError(result.Message);
+        }
+
+    }
+}
