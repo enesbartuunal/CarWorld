@@ -1,0 +1,26 @@
+﻿<AuthorizeView>
+    <Authorized>
+        Hello, @context.User.Identity.Name!
+        <NavLink class="nav-link" href="productcreate">
+            <span class="oi oi-plus" aria-hidden="true"></span>Add Product
+        </NavLink>
+        <NavLink class="nav-link" href="myaccount">
+            <span class="oi oi-person" aria-hidden="true"></span>
+            My Account
+        </NavLink>
+        <NavLink class="nav-link" href="logout">
+            <span class="oi oi-account-logout" aria-hidden="true"></span>
+            Log out
+        </NavLink>
+    </Authorized>
+    <NotAuthorized>
+        <NavLink class="nav-link" href="signup">
+            <span class="oi oi-people" aria-hidden="true"></span>
+            Register
+        </NavLink>
+        <NavLink class="nav-link" href="login">
+            <span class="oi oi-account-login" aria-hidden="true"></span>
+            Log İn
+        </NavLink>
+    </NotAuthorized>
+</AuthorizeView>

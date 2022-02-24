@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace ProductCatalogue.Api.Controllers
 {
@@ -56,8 +57,8 @@ namespace ProductCatalogue.Api.Controllers
                 return BadRequest(new Result<IEnumerable<string>>(false, ResultConstant.IdNotNull, errors));
             }
 
-            var  roleResult = await _userManager.AddToRoleAsync(user, ResultConstant.Role_Member);
-          
+            var roleResult = await _userManager.AddToRoleAsync(user, ResultConstant.Role_Member);
+
             if (!roleResult.Succeeded)
             {
                 var errors = roleResult.Errors.Select(e => e.Description);
@@ -85,18 +86,34 @@ namespace ProductCatalogue.Api.Controllers
                 return Unauthorized(new Result<IActionResult>(false, ResultConstant.LockOut));
             else if (!result.Succeeded)
                 return Unauthorized(new Result<IActionResult>(false, ResultConstant.CheckPassword));
-           
+
+            var signingCredentials = _tokenService.GetSigningCredentials();
+            var claims = await _tokenService.GetClaims(user);
+            var tokenOptions = _tokenService.GenerateTokenOptions(signingCredentials, claims);
+            user.RefreshToken = _tokenService.GenerateRefreshToken();
+            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
+            await _userManager.UpdateAsync(user);
             var returnData = new SignInResponseModel()
             {
                 UserName = user.UserName,
                 Id = user.Id,
                 Email = user.Email,
-                Token = _tokenService.CreateToken(user, userRole)
+                Token = new JwtSecurityTokenHandler().WriteToken(tokenOptions),
+                RefreshToken=user.RefreshToken
             };
-            return Ok(new Result<SignInResponseModel>(true, ResultConstant.TokenResponseMessage, returnData));
+          
+            return Ok(returnData);
         }
 
-
+        [HttpPost("getuserid")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserId([FromBody] string userName)
+        {
+            if (userName==null)
+                return BadRequest();
+            var userExists = await _userManager.FindByEmailAsync(userName);
+            return Ok(userExists.Id);
+        }
 
 
     }

@@ -7,6 +7,10 @@ namespace ProductCatalogue.DataAccess.Entities
 {
     public class User : IdentityUser
     {
+        public string RefreshToken { get; set; }
+
+        public DateTime RefreshTokenExpiryTime { get; set; }
+
         //Relation
 
         public virtual List<Offer> Offers { get; set; }

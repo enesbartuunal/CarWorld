@@ -59,6 +59,8 @@ namespace ProductCatalogue.Api.Controllers
         //[Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Post([FromBody] OfferModel model)
         {
+            var user= _service.GetByName(model.UserId);
+            model.UserId = user.Id;
             var data = await _service.Add(model);
             if (data.IsSuccess)
                 return StatusCode(201);

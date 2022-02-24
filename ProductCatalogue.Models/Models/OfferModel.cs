@@ -17,5 +17,7 @@ namespace ProductCatalogue.Models.Models
         public string UserId { get; set; }
 
         public int ProductId { get; set; }
+
+        public bool IsAccept { get; set; }
     }
 }

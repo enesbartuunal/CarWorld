@@ -28,5 +28,9 @@ namespace ProductCatalogue.Models.Models
         public bool IsOfferable { get; set; }
         [Required(ErrorMessage = "Category is required field")]
         public int CategoryId { get; set; }
+
+        public bool IsSold { get; set; }
+
+        public string UserId { get; set; }
     }
 }

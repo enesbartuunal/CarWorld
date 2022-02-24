@@ -26,6 +26,8 @@ namespace ProductCatalogue.DataAccess.Entities
 
         public bool IsOfferable { get; set; }
 
+        public bool IsSold { get; set; }
+
         //Relation
 
         public int CategoryId { get; set; }
@@ -33,5 +35,9 @@ namespace ProductCatalogue.DataAccess.Entities
         public virtual Category Category { get; set; }
 
         public virtual List<Offer> Offers { get; set; }
+
+        public virtual User User { get; set; }
+
+        public string UserId { get; set; }
     }
 }

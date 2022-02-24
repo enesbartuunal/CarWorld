@@ -90,11 +90,11 @@ namespace ProductCatalogue.UI.Services.Implementation
             if (putResult.IsSuccessStatusCode)
             {
                 var result = JsonConvert.DeserializeObject<OfferModel>(putContent);
-                return new Result<OfferModel>(true, ResultConstant.RecordUpdateSuccessfully, result);
+                return new Result<OfferModel>(true,"Transaction Successful", result);
             }
             else
             {
-                return new Result<OfferModel>(false, ResultConstant.RecordUpdateNotSuccessfully);
+                return new Result<OfferModel>(false, "Failed");
             }
         }
     }

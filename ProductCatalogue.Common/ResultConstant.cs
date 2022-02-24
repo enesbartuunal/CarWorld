@@ -21,6 +21,11 @@ namespace ProductCatalogue.Common
         public const string UserAlreadyExists = "User already exists!";
         public const string CheckPassword = "Please check your password!";
         public const string LockOut = "Your account is locked,please try again after sometimes!";
+        public const string ProductWasSoldedSuccessfully= "The product was purchased successfully";
+        public const string ProductWasSoldedNotSuccessfully = "The product could not be sold";
+        public const string OfferReject = "The offer for this product was rejected";
+        public const string OfferAccept = "Offer accepted";
+
         //---------------------------------------------------------------------------------------
 
         public const string Role_Admin = "Admin";

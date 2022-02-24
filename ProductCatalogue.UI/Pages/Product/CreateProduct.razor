@@ -81,13 +81,22 @@
 </EditForm>
 
 @code {
+
+    [CascadingParameter]
+    public Task<AuthenticationState> authenticationStateTask { get; set; }
     private ProductModel product = new ProductModel();
     [Inject]
     public IProductHttpService ProductService { get; set; }
     [Inject]
     public IToastService toastService { get; set; }
+    [Inject]
+    public IAuthenticationHttpService AccountService { get; set; }
     private async Task Create()
     {
+        var userdata = (await authenticationStateTask).User;
+        var userid = await AccountService.GetUserIdbyName(userdata.Identity.Name);
+        product.IsSold = false;
+        product.UserId = userid.Data;
         var result = await ProductService.CreateProduct(product);
         if (result.IsSuccess)
         {

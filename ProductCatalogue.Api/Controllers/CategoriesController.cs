@@ -57,7 +57,7 @@ namespace ProductCatalogue.Api.Controllers
 
         // POST api/<CategoriesController>
         [HttpPost]
-        //[Authorize(Policy = "RequireAdminRole")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Post([FromBody] CategoryModel model)
         {
             var data = await _service.Add(model);
@@ -69,7 +69,7 @@ namespace ProductCatalogue.Api.Controllers
 
         // PUT api/<CategoriesController>/5
         [HttpPut("{id}")]
-        //[Authorize(Policy = "RequireAdminRole")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Put(int id, [FromBody] CategoryModel model)
         {
 
@@ -85,7 +85,7 @@ namespace ProductCatalogue.Api.Controllers
 
         // DELETE api/<CategoriesController>/5
         [HttpDelete("{id}")]
-        //[Authorize(Policy = "RequireAdminRole")]
+        [Authorize(Policy = "RequireAdminRole")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id is null)

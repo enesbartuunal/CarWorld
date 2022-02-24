@@ -1,0 +1,286 @@
+﻿@page "/myaccount"
+<h3>MyAccount</h3>
+
+<RadzenTabs TabPosition="TabPosition.Top" style="height: 800px; width: 1600px; margin: 20px auto;" RenderMode="TabRenderMode.Client">
+    <Tabs>
+        <RadzenTabsItem Text="MyProducts">
+            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                            Data="@ProductList.Where(x => x.UserId == _userId.Data)" TItem="ProductModel" ColumnWidth="200px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@SelectedProduct>
+                <Columns>
+                    <RadzenDataGridColumn TItem="ProductModel" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="60px">
+                        <Template Context="data">
+                            <RadzenImage Path="@data.Image" style="width: 40px; height: 40px; border-radius: 8px;" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="ProductModel" Property="Description" Filterable="false" Title="ID" Frozen="true" Width="70px" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn TItem="ProductModel" Property="ProductName" Title="ProductName" Frozen="true" Width="140px" />
+                    <RadzenDataGridColumn TItem="ProductModel" Property="Color" Title="Color" Width="70px" />
+                    <RadzenDataGridColumn TItem="ProductModel" Property="Brand" Title="Brand" Width="70px" />
+                    <RadzenDataGridColumn TItem="ProductModel" Property="Status" Title="Status" Width="70px" />
+                    <RadzenDataGridColumn TItem="ProductModel" Property="Price" Title="Price" Width="70px" />
+                    <RadzenDataGridColumn TItem="ProductModel" Property="IsSold" Title="IsSold" Width="70px" />
+                </Columns>
+            </RadzenDataGrid>
+            <br />
+            <RadzenButton Text="Update Selected Product" ButtonStyle="@ButtonStyle.Secondary" Click="@(()=>GotoUpdate(SelectedProduct))" />
+            <RadzenButton Text="DeleteSelected Product" ButtonStyle="@ButtonStyle.Warning" Click="@(()=>Delete(SelectedProduct))" />
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="MyGetOffers">
+            <div class="row py-5">
+                <div class="col">
+                    <RadzenCard>
+                        <RadzenDataList WrapItems="true" AllowPaging="true" Data="@OfferList.Where(x=>x.IsActive==true&&x.IsAccept==false)" TItem="OfferModel" PageSize="10" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true" PagerAlwaysVisible="true">
+                            <Template Context="offer">
+                                <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
+                                    <div class="row">
+                                        <div class="col-lg-2 p-3 product-title">
+                                            <img src="@(ProductList.Where(x=>x.Id==offer.ProductId).Select(x => x.Image).FirstOrDefault())"
+                                                 style="width: 50px; height: 50px; border-radius: 8px;" />
+                                        </div>
+                                        <div class="col-md-6 col-lg-2 product-badge">
+                                            <h5 class="mb-0">Product Name:</h5>
+                                            <p class="mb-sm-2 mb-lg-2"> @(ProductList.Where(x=>x.Id==offer.ProductId).Select(x => x.ProductName).FirstOrDefault())</p>
+                                        </div>
+
+                                        <div class="col-md-6 col-lg-2 product-badge">
+                                            <h5 class="mb-0">Price:</h5>
+                                            <p class="mb-sm-2 mb-lg-2">  Offer=>@(offer.Price)$</p>
+                                        </div>
+                                        <div class="col-lg-2 p-3">
+                                            <RadzenButton Text="Accept" Class="w-60" ButtonStyle="@ButtonStyle.Success" Click="@(()=>AcceptOffer(offer))" />
+                                        </div>
+                                        <div class="col-lg-2 p-3">
+                                            <RadzenButton Text="Reject" Class="w-60" ButtonStyle="@ButtonStyle.Warning" Click="@(()=>RejectOffer(offer))" />
+                                        </div>
+                                    </div>
+
+                                </RadzenCard>
+                            </Template>
+                        </RadzenDataList>
+                    </RadzenCard>
+                </div>
+
+            </div>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="MyOffers">
+            <div class="row py-5">
+                <div class="col">
+                    <RadzenCard>
+                        <RadzenDataList WrapItems="true" AllowPaging="true" Data="@GetOfferList" TItem="OfferModel" PageSize="10" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true" PagerAlwaysVisible="true">
+                            <Template Context="offer">
+                                <RadzenCard Style="width: 100%; padding: 0; overflow: hidden;">
+                                    <div class="row">
+                                        <div class="col-lg-2 p-3 product-title">
+                                            <img src="@(ProductList.Where(x=>x.Id==offer.ProductId).Select(x => x.Image).FirstOrDefault())"
+                                                 style="width: 50px; height: 50px; border-radius: 8px;" />
+                                        </div>
+                                        <div class="col-md-6 col-lg-2 product-badge">
+                                            <h5 class="mb-0">Product Name:</h5>
+                                            <p class="mb-sm-2 mb-lg-2"> @(ProductList.Where(x=>x.Id==offer.ProductId).Select(x => x.ProductName).FirstOrDefault())</p>
+                                        </div>
+
+                                        <div class="col-md-6 col-lg-2 product-badge">
+                                            <h5 class="mb-0">Price:</h5>
+                                            <p class="mb-sm-2 mb-lg-2">  Offer=>@(offer.Price)$</p>
+                                        </div>
+                                        @if (offer.IsActive && !offer.IsAccept)
+                                        {
+                                            <div class="col-md-6 col-lg-2 product-badge" style="background-color:#ff6a00">
+                                                <h5 class="mb-0">
+                                                    Waiting...
+                                                </h5>
+                                            </div>
+                                            <div class="col-lg-2 p-3">
+                                                <RadzenButton Text="Pull" Class="w-60" ButtonStyle="@ButtonStyle.Warning" Click="@(()=>DeleteOffer(offer))" />
+                                            </div>
+                                        }
+                                        else if (offer.IsActive && offer.IsAccept)
+                                        {
+                                            <div class="col-md-6 col-lg-2 product-badge" style="background-color:#4cff00">
+                                                <h5 class="mb-0">
+                                                    Accepted
+                                                </h5>
+                                            </div>
+                                            <div class="col-lg-2 p-3">
+                                                <RadzenButton Text="Buy" Class="w-60" ButtonStyle="@ButtonStyle.Success" Click="@(()=>ProductBuy(offer))" />
+                                            </div>
+                                            <div class="col-lg-2 p-3">
+                                                <RadzenButton Text="Pull" Class="w-60" ButtonStyle="@ButtonStyle.Warning" Click="@(()=>DeleteOffer(offer))" />
+                                            </div>
+                                        }
+                                        else if(!offer.IsAccept)
+                                        {
+                                            <div class="col-md-6 col-lg-2 product-badge" style="background-color:#ff0000">
+                                                <h5 class="mb-0">Offer Rejected</h5>
+
+                                            </div>
+                                        }
+
+                                    </div>
+
+                                </RadzenCard>
+                            </Template>
+                        </RadzenDataList>
+                    </RadzenCard>
+                </div>
+
+            </div>
+
+            <style>
+                .product-title {
+                    min-height: 72px;
+                    color: #da0074;
+                    background-color: rgba(255, 41, 155, .1);
+                    font-size: 20px;
+                    font-weight: bold;
+                    line-height: 20px;
+                    letter-spacing: -0.02em;
+                }
+
+                .price-badge {
+                    font-size: 16px;
+                    font-weight: bold;
+                    line-height: 20px;
+                    padding: 8px;
+                }
+            </style>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [Inject]
+    public IProductHttpService ProductService { get; set; }
+
+    [Inject]
+    public IOfferHttpService OfferService { get; set; }
+
+    [Inject]
+    public IAuthenticationHttpService AccountService { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    public IToastService toastService { get; set; }
+
+    public IEnumerable<ProductModel> ProductList { get; set; } = new List<ProductModel>();
+
+    public IList<ProductModel> SelectedProduct { get; set; }
+
+    public List<OfferModel> OfferList { get; set; } = new List<OfferModel>();
+
+    public List<OfferModel> GetOfferList { get; set; } = new List<OfferModel>();
+
+    public Result<string> _userId { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        var userdata = (await authenticationStateTask).User;
+        _userId = await AccountService.GetUserIdbyName(userdata.Identity.Name);
+        
+        var data = await ProductService.GetProductsByCategory();
+        ProductList = data.Data.ToList();
+        SelectedProduct = ProductList.Take(1).ToList();
+
+        var offerdata = await OfferService.GetOffer();
+        if (offerdata.Data.Count() > 0)
+        {
+            foreach (var item in ProductList)
+            {
+                var offer = offerdata.Data.Where(q => q.ProductId == item.Id).FirstOrDefault();
+                @if (offer != null)
+                    OfferList.Add(offer);
+            }
+        }
+        GetOfferList = offerdata.Data.Where(w => w.UserId == _userId.Data && w.IsActive ==true).ToList();
+    }
+
+    public void GotoUpdate(IList<ProductModel> model)
+    {
+        var result = model.First();
+        var url = Path.Combine("/updateproduct/", result.Id.ToString());
+        NavigationManager.NavigateTo(url);
+    }
+
+    public async Task Delete(IList<ProductModel> model)
+    {
+        var product = model.First();
+        var result = await ProductService.DeleteProduct(product.Id.ToString());
+        if (result.IsSuccess)
+        {
+            toastService.ShowSuccess(result.Message);
+            NavigationManager.NavigateTo("/myaccount");
+        }
+        else
+        {
+            toastService.ShowError(result.Message);
+        }
+    }
+
+    public async Task RejectOffer(OfferModel model)
+    {
+        model.IsActive = false;
+        var result = await OfferService.UpdateOffer(model);
+        if (result.IsSuccess)
+        {
+            toastService.ShowInfo(result.Message);
+
+        }
+        else
+        {
+            toastService.ShowError(result.Message);
+        }
+    }
+    public async Task DeleteOffer(OfferModel model)
+    {
+        var result = await OfferService.DeleteOffer(model.Id.ToString());
+        if (result.IsSuccess)
+        {
+            toastService.ShowInfo(result.Message);
+
+        }
+        else
+        {
+            toastService.ShowError(result.Message);
+        }
+    }
+    public async Task AcceptOffer(OfferModel model)
+    {
+        model.IsAccept = true;
+        var result = await OfferService.UpdateOffer(model);
+        if (result.IsSuccess)
+        {
+            toastService.ShowInfo(result.Message);
+
+        }
+        else
+        {
+            toastService.ShowError(result.Message);
+        }
+    }
+    public async Task ProductBuy(OfferModel model)
+    {
+        await Task.Delay(2000);
+        var product = await ProductService.GetProductById(model.ProductId.ToString());
+        product.Data.IsSold = true;
+        model.IsActive = false;
+        var update = await OfferService.UpdateOffer(model);
+        @if (update.IsSuccess)
+        {
+            var result = await ProductService.UpdateProduct(product.Data);
+
+            if (result.IsSuccess)
+            {
+                toastService.ShowSuccess(result.Message);
+
+            }
+            else
+            {
+                toastService.ShowError(result.Message);
+            }
+        }
+    }
+}

@@ -7,21 +7,21 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <ul class="nav flex-column">
-        <li class="nav-item px-3">
+        @*<li class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="createcategory">
-                <span class="oi oi-plus" aria-hidden="true"></span> Category
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="productcreate">
-                <span class="oi oi-plus" aria-hidden="true"></span> Product
-            </NavLink>
-        </li>
+        </li>*@
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="createcategory">
+                        <span class="oi oi-plus" aria-hidden="true"></span> Category
+                    </NavLink>
+                </li>
+            </Authorized>
+        </AuthorizeView>
+     
         @foreach (var category in Categories)
         {
             <li class="nav-item px-3">
@@ -29,8 +29,12 @@
                     <span class="oi oi-list-rich" aria-hidden="true"></span> @category.CategoryName
 
                 </NavLink>
-                <button type="button" class="btn btn-info" @onclick="() => RedirectToUpdate(category.Id)">Update</button>
-                <button type="button" class="btn btn-danger" @onclick="() =>DeleteCategory(category.Id)">Delete</button>
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <button type="button" class="btn btn-info" @onclick="() => RedirectToUpdate(category.Id)">Update</button>
+                        <button type="button" class="btn btn-danger" @onclick="() =>DeleteCategory(category.Id)">Delete</button>
+                    </Authorized>
+                </AuthorizeView>
             </li>
         }
     </ul>
@@ -46,6 +50,7 @@
         collapseNavMenu = !collapseNavMenu;
     }
 
+
     public List<CategoryModel> Categories { get; set; } = new List<CategoryModel>();
     public string ErrorMessage { get; set; }
     public int TotalCount { get; set; }
@@ -54,8 +59,12 @@
     [Inject]
     public NavigationManager NavigationManager { get; set; }
 
+  
+
+
     protected async override Task OnInitializedAsync()
     {
+      
         await GetAllCategory();
     }
     private async Task GetAllCategory()
@@ -88,4 +97,5 @@
         }
         await GetAllCategory();
     }
+    
 }

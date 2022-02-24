@@ -14,6 +14,8 @@ namespace ProductCatalogue.DataAccess.Entities
 
         public bool IsActive { get; set; }
 
+        public bool IsAccept { get; set; }
+
         //Relation
         public string UserId { get; set; }
 
