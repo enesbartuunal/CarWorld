@@ -29,29 +29,47 @@ namespace ProductCatalogue.EmailApi.Service
                 Port = 587,
                 Credentials = new NetworkCredential(SenderMail, SenderMailPassword)
             };
-            string subject = "Welcome!";
-            string body = "Registration completed successfully";
-            try
+            string subject;
+            string body;
+            if (context.Message.TryCount == 7)
             {
-                email.Send(SenderMail, context.Message.Adress, subject, body);
-            }
-
-            catch 
-            {
-                if (context.Message.TryCount <= 5)
+                subject = "Warning!";
+                body = "Your account has been blocked for 30 minutes.";
+                try
                 {
-                    context.Message.TryCount += 1;
-                    var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri("queue:failedsendingmail"));
-                    await sendEndpoint.Send<EmailModel>(context.Message);
+                    email.Send(SenderMail, context.Message.Adress, subject, body);
                 }
+                catch { }
                
             }
+            else
+            {
+                subject = "Welcome!";
+                body = "Registration completed successfully";
+                try
+                {
+                    email.Send(SenderMail, context.Message.Adress, subject, body);
+                }
+
+                catch
+                {
+                    if (context.Message.TryCount <= 5)
+                    {
+                        context.Message.TryCount += 1;
+                        var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri("queue:failedsendingmail"));
+                        await sendEndpoint.Send<EmailModel>(context.Message);
+                    }
+
+                }
+            }
+
+
 
         }
 
-        public const string SenderMail = "enesbartuunal2040@gmail.com";
+        public const string SenderMail = "";
 
-        public const string SenderMailPassword = "ebu155015502040";
+        public const string SenderMailPassword = "";
 
 
     }

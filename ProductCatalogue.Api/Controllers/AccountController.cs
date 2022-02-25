@@ -92,8 +92,13 @@ namespace ProductCatalogue.Api.Controllers
             if (user is null)
                 return Unauthorized(new Result<IActionResult>(false, ResultConstant.InvalidAuthentication));
             var result = await _signInManager.PasswordSignInAsync(user.Email, model.Password, false, true);
-            if (result.IsLockedOut)
+            if (result.IsLockedOut) {
+                var emailModel = new EmailModel();
+                emailModel.Adress = model.UserName;
+                emailModel.TryCount = 7;
+                await _emailService.SendEmailCommand(emailModel);
                 return Unauthorized(new Result<IActionResult>(false, ResultConstant.LockOut));
+            }
             else if (!result.Succeeded)
                 return Unauthorized(new Result<IActionResult>(false, ResultConstant.CheckPassword));
 
@@ -123,7 +128,7 @@ namespace ProductCatalogue.Api.Controllers
                 return BadRequest();
             var userExists = await _userManager.FindByEmailAsync(userName);
             return Ok(userExists.Id);
-                        
+
         }
 
 

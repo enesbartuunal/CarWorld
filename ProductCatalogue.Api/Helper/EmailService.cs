@@ -18,6 +18,7 @@ namespace ProductCatalogue.Api.Helper
 
         public async Task Consume(ConsumeContext<EmailModel> context)
         {
+           
             if (context.Message.TryCount < 6)
             {
                 var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri("queue:sendsignupmessage"));
@@ -32,7 +33,8 @@ namespace ProductCatalogue.Api.Helper
 
         public async Task SendEmailCommand(EmailModel emailAdress)
         {
-            emailAdress.TryCount = 1;
+            if (emailAdress.TryCount != 7)
+                emailAdress.TryCount = 1;
             var sendEndpoint = await _sendEndpointProvider.GetSendEndpoint(new Uri("queue:sendsignupmessage"));
             await sendEndpoint.Send<EmailModel>(emailAdress);
         }
