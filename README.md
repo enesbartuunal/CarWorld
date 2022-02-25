@@ -7,7 +7,8 @@
 
 *-Proje testi yapılırken Api,UI;EmailApi projeleri çalışmalı.
 *-EmailApi de EmailSendService clasında Sender Email ve Password manuel olarak set edilmeli.
-
+*-Hoşgeldin Email gönderimi başarısız olursa 5 kez daha mail göndermeyi deniyor.Tekrar Başarısız olursa UI'a mesaj gönderiyor.
+*-Hesap Blokesi olduktan sonra Kullancıya sadece 1 kez mail gönderiyor başarısız olursa tekrar işlem yapmıyor.
 *-ÜYEOLDETAYLARI
 *-Tüm istenenler yapıldı.Hoşgeldin maili Kullanıcıya gonderiliyor.
 
