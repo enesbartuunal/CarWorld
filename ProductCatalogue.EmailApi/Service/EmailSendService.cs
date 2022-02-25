@@ -67,9 +67,9 @@ namespace ProductCatalogue.EmailApi.Service
 
         }
 
-        public const string SenderMail = "";
+        public const string SenderMail = "enesbartuunal2040@gmail.com";
 
-        public const string SenderMailPassword = "";
+        public const string SenderMailPassword = "ebu155015502040";
 
 
     }

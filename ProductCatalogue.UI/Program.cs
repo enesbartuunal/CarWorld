@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Components.Authorization;
 using ProductCatalogue.UI.AuthProvider;
 using Blazored.LocalStorage;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
-using MassTransit;
 using ProductCatalogue.UI.Services.Helper;
 
 namespace ProductCatalogue.UI
@@ -27,27 +26,6 @@ namespace ProductCatalogue.UI
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
-            builder.Services.AddMassTransit(x =>
-            {
-                x.AddConsumer<ConfirmEmail>();
-                x.UsingRabbitMq((content, cfg) =>
-                {
-
-                    cfg.Host("localhost", "/", host =>
-                    {
-                        host.Username("guest");
-                        host.Password("guest");
-                    });
-
-                    cfg.ReceiveEndpoint("usernotconfirmed", e =>
-                    {
-
-                        e.ConfigureConsumer<ConfirmEmail>(content);
-                    });
-
-                });
-            });
-            builder.Services.AddMassTransitHostedService();
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:44341/api/") });
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddAuthorizationCore();
