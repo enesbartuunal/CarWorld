@@ -2,13 +2,14 @@
 
 *-Proje başlarken default olarak "admin@gmail.com" adında Rolu admin olan bir kullanıcı oluşturuyor.Password="1234Admin." 
 
+
 *-Veri tabanı oluşturmak için DataAccess katmanında ManageConsala "add-migration " ve "update-database" komutları yapılmalı.Ms Sql Kullanıldı.
 
 *-Proje testi yapılırken Api,UI;EmailApi projeleri çalışmalı.
-
+*-EmailApi de EmailSendService clasında Sender Email ve Password manuel olarak set edilmeli.
 
 *-ÜYEOLDETAYLARI
-*-Tüm istenenler yapıldı.Hoşgeldin maili Kullanıcıya gonderiliyor.Burada sahsi mailimi ne yazık ki kullandım:)
+*-Tüm istenenler yapıldı.Hoşgeldin maili Kullanıcıya gonderiliyor.
 
 *-ÜYEOLGİRİŞDETAYLARI
 *-Tüm istenenler yapıldı.Bloke Maili Gönderiliyor.
