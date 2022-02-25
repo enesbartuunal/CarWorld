@@ -1,3 +1,5 @@
+using MassTransit;
+using MassTransit.MultiBus;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
+using ProductCatalogue.Api.Helper;
 using ProductCatalogue.Business.Base;
 using ProductCatalogue.Business.Implementaion;
 using ProductCatalogue.DataAccess.Context;
@@ -40,6 +43,28 @@ namespace ProductCatalogue.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMassTransit(x => {
+
+                x.AddConsumer<EmailService>();
+
+                x.UsingRabbitMq((content, cfg) =>
+                {
+                    cfg.Host(Configuration["RabbitMQUrl"], "/", host =>
+                    {
+                        host.Username("guest");
+                        host.Password("guest");
+                    });
+
+                    cfg.ReceiveEndpoint("failedsendingmail", e =>
+                    {
+
+                        e.ConfigureConsumer<EmailService>(content);
+                    });
+                                        
+                });
+            
+            });
+            services.AddMassTransitHostedService();
             services.AddCors(policy =>
             {
                 policy.AddPolicy("CorsPolicy", opt => opt
@@ -84,6 +109,7 @@ namespace ProductCatalogue.Api
             services.AddScoped<CategoryService>();
             services.AddScoped<ProductService>();
             services.AddScoped<OfferService>();
+            services.AddScoped<EmailService>();
             services.AddRouting(x => x.LowercaseUrls = true);
             services.AddControllers().AddJsonOptions(opt => opt.JsonSerializerOptions.PropertyNamingPolicy = null)
                 .AddNewtonsoftJson(opt =>

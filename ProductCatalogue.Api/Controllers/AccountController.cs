@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
+using ProductCatalogue.Api.Helper;
 
 namespace ProductCatalogue.Api.Controllers
 {
@@ -23,13 +24,15 @@ namespace ProductCatalogue.Api.Controllers
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ITokenService _tokenService;
+        private readonly EmailService _emailService;
 
-        public AccountController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, ITokenService tokenService, SignInManager<User> signInManager)
+        public AccountController(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, ITokenService tokenService, SignInManager<User> signInManager, EmailService emailService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _roleManager = roleManager;
             _tokenService = tokenService;
+            _emailService = emailService;
         }
 
         [HttpPost("signup")]
@@ -64,6 +67,13 @@ namespace ProductCatalogue.Api.Controllers
                 var errors = roleResult.Errors.Select(e => e.Description);
                 return BadRequest(new Result<IEnumerable<string>>(false, ResultConstant.IdNotNull, errors));
             }
+
+            //Send Command to RabbitMQ
+            var emailModel = new EmailModel();
+            emailModel.Adress = model.Email;
+            await _emailService.SendEmailCommand(emailModel);
+
+
             return StatusCode(201);
         }
 
@@ -99,9 +109,9 @@ namespace ProductCatalogue.Api.Controllers
                 Id = user.Id,
                 Email = user.Email,
                 Token = new JwtSecurityTokenHandler().WriteToken(tokenOptions),
-                RefreshToken=user.RefreshToken
+                RefreshToken = user.RefreshToken
             };
-          
+
             return Ok(returnData);
         }
 
@@ -109,10 +119,11 @@ namespace ProductCatalogue.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetUserId([FromBody] string userName)
         {
-            if (userName==null)
+            if (userName == null)
                 return BadRequest();
             var userExists = await _userManager.FindByEmailAsync(userName);
             return Ok(userExists.Id);
+                        
         }
 
 

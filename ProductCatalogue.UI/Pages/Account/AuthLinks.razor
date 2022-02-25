@@ -1,6 +1,8 @@
 ﻿<AuthorizeView>
     <Authorized>
-        Hello, @context.User.Identity.Name!
+        <span style="color:darkmagenta">
+            Hello, @context.User.Identity.Name
+        </span>
         <NavLink class="nav-link" href="productcreate">
             <span class="oi oi-plus" aria-hidden="true"></span>Add Product
         </NavLink>
@@ -24,3 +26,4 @@
         </NavLink>
     </NotAuthorized>
 </AuthorizeView>
+
